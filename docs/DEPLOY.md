@@ -255,6 +255,7 @@ Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/�
 2. よくある原因:
    - `NODE_ENV=production` のとき devDependencies が入らず TypeScript ビルドが失敗 → `buildCommand` に `--include=dev`
    - ビルド中に DB に接続できない（`P1001: Can't reach database server`）→ `prisma db push` を **Build Command から削除**し、**Start Command** で実行
+   - ランタイムで `Can't reach database server at dpg-xxx-a:5432` → **API と DB のリージョン不一致**。`DATABASE_URL` を **External Database URL** に変更するか、両方を同じリージョンに揃える
    - `render.yaml` を更新しても古い Build Command が使われている → Settings で手動更新、または Blueprint **Sync**
 3. `DATABASE_URL` が DB にリンクされているか確認
 4. Build ログで `prisma db push` が成功しているか確認
@@ -272,6 +273,93 @@ curl --max-time 90 https://tasks-app-api-9jkk.onrender.com/api/health
 ### Vercel で 404（ページリロード時）
 
 `frontend/vercel.json` の SPA リライト設定があることを確認してください（リポジトリに含まれています）。
+
+---
+
+## Singapore リージョンで作り直す（日本向け）
+
+Render には Tokyo リージョンはありません。日本から最も近いのは **Singapore** です。  
+API と DB は **同じリージョン** にしないと内部接続できません（[Render Regions](https://render.com/docs/regions)）。
+
+> Render は既存サービスのリージョン変更に対応していないため、**削除して作り直す**必要があります。
+
+### 手順
+
+#### 1. 古いリソースを削除（Oregon など）
+
+Render Dashboard で以下を削除:
+
+- `tasks-app-api`（旧 API）
+- `tasks-db`（旧 DB）
+
+※ まだタスクデータがなければそのまま削除で問題ありません。
+
+#### 2. GitHub に最新の `render.yaml` を push
+
+```bash
+git add render.yaml docs/DEPLOY.md
+git commit -m "Set Render region to Singapore for API and DB"
+git push origin main
+```
+
+#### 3. Blueprint で再デプロイ
+
+1. **New** → **Blueprint**
+2. `Naoya827/TasksApp` を選択 → **Apply**
+3. 作成時に **Region: Singapore** になっていることを確認
+4. デプロイ完了まで待つ（5〜10分）
+
+#### 4. Settings を手動確認
+
+`tasks-app-api` → **Settings**:
+
+| 項目 | 値 |
+|------|-----|
+| **Region** | Singapore |
+| **Build Command** | `npm install --include=dev && npm run build` |
+| **Start Command** | `npm run start:render` |
+
+`tasks-db` → **Info** で **Region: Singapore** を確認。
+
+#### 5. Seed を実行
+
+```bash
+cd backend
+DATABASE_URL="（External Database URL）" npx prisma db push
+DATABASE_URL="（External Database URL）" npm run db:seed
+```
+
+Render → `tasks-db` → **Connections** → **External Database URL** をコピー。
+
+#### 6. Vercel の環境変数を更新
+
+新しい API URL に変わるため、Vercel → **Settings** → **Environment Variables**:
+
+| Key | Value |
+|-----|-------|
+| `VITE_API_BASE` | `https://（新しいAPIのURL）/api` |
+
+例: `https://tasks-app-api-xxxx.onrender.com/api`
+
+変更後 **Redeploy** してください。
+
+#### 7. Render の CORS を更新
+
+`tasks-app-api` → **Environment**:
+
+| Key | Value |
+|-----|-------|
+| `CORS_ORIGIN` | `https://tasks-app-rose-eight.vercel.app` |
+
+末尾スラッシュなし。
+
+#### 8. 動作確認
+
+```bash
+curl --max-time 90 https://（新しいAPIのURL）/api/health
+```
+
+ブラウザでログインを試す。
 
 ---
 

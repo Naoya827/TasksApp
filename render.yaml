@@ -1,10 +1,12 @@
-# Render Blueprint
+# Render Blueprint（Singapore リージョン）
 # Dashboard → New → Blueprint → このリポジトリを選択してデプロイ
+# ※ API と DB は必ず同じリージョンにすること
 databases:
   - name: tasks-db
     databaseName: tasks_app
     user: tasks_app
     plan: free
+    region: singapore
 
 services:
   - type: web
