@@ -211,9 +211,40 @@ Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/�
 - [ ] Vercel の `VITE_API_BASE` が正しい Render URL を指している
 - [ ] Render の `CORS_ORIGIN` が Vercel の URL と一致している
 
-### パスワード変更（任意）
+### パスワード・メールアドレスの変更
 
-現時点ではパスワード変更 API は未実装です。変更する場合は Seed スクリプトのパスワードを書き換えて再実行するか、DB を直接更新してください。
+本番のログイン情報は、ローカルから Render の DB に接続して更新します。
+
+1. Render → `tasks-db` → **Connections** → **External Database URL** をコピー
+2. ターミナルで実行（値は実際のものに置き換え）:
+
+```bash
+cd backend
+
+DATABASE_URL="postgresql://..." \
+USER_NAOYA_EMAIL="naoya@your-email.com" \
+USER_NAOYA_PASSWORD="（なおやの新しいパスワード）" \
+USER_AYUMI_EMAIL="ayumi@your-email.com" \
+USER_AYUMI_PASSWORD="（あゆみの新しいパスワード）" \
+npm run db:update-credentials
+```
+
+メールアドレスを `naoya@example.com` から変更する場合は、デフォルトで旧メールから検索して更新します。  
+別の旧メールから変更する場合は `USER_NAOYA_OLD_EMAIL` / `USER_AYUMI_OLD_EMAIL` も指定してください。
+
+成功すると次のように表示されます:
+
+```
+Updated: なおや (naoya@example.com → naoya@your-email.com)
+Updated: あゆみ (ayumi@example.com → ayumi@your-email.com)
+Credentials updated successfully.
+```
+
+3. Vercel の URL で、**新しいメール・パスワード**でログインできることを確認
+
+※ パスワードはターミナル履歴に残るため、実行後はシェル履歴の扱いに注意してください。
+
+### パスワード変更（任意・旧手順）
 
 ---
 
