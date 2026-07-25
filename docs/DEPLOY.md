@@ -73,6 +73,16 @@ Phase 2（本番運用にアップグレード）
 6. `tasks-app-api` の **URL** をメモする  
    例: `https://tasks-app-api.onrender.com`
 
+> **重要:** `render.yaml` を変更しても、既存サービスの設定は自動更新されないことがあります。  
+> デプロイが失敗する場合は、`tasks-app-api` → **Settings** で以下を手動設定してください:
+>
+> | 項目 | 値 |
+> |------|-----|
+> | **Build Command** | `npm install --include=dev && npm run build` |
+> | **Start Command** | `npm run start:render` |
+>
+> または Blueprint 画面から **Sync** を実行してください。
+
 ### ヘルスチェック
 
 ブラウザまたは curl で確認:
@@ -244,7 +254,8 @@ Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/�
    - `tasks-app-api` → **Events** タブ → 最新の Deploy をクリック → **Build logs**
 2. よくある原因:
    - `NODE_ENV=production` のとき devDependencies が入らず TypeScript ビルドが失敗 → `buildCommand` に `--include=dev`
-   - ビルド中に DB に接続できない（`P1001: Can't reach database server`）→ `prisma db push` は `preDeployCommand` で実行
+   - ビルド中に DB に接続できない（`P1001: Can't reach database server`）→ `prisma db push` を **Build Command から削除**し、**Start Command** で実行
+   - `render.yaml` を更新しても古い Build Command が使われている → Settings で手動更新、または Blueprint **Sync**
 3. `DATABASE_URL` が DB にリンクされているか確認
 4. Build ログで `prisma db push` が成功しているか確認
 

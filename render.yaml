@@ -14,8 +14,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm install --include=dev && npm run build
-    preDeployCommand: npx prisma db push --skip-generate
-    startCommand: npm start
+    startCommand: npm run start:render
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
