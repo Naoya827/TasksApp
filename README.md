@@ -42,13 +42,6 @@ npm run dev
 
 フロントエンドは `http://localhost:5173` で起動します。
 
-## ログイン情報（Seed）
-
-| 名前 | メールアドレス | パスワード |
-|------|---------------|-----------|
-| なおや | naoya@example.com | password123 |
-| あゆみ | ayumi@example.com | password123 |
-
 ## 主な機能
 
 - JWT 認証によるログイン
