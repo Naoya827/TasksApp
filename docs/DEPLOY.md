@@ -242,8 +242,9 @@ Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/�
 
 1. **Build Logs** を確認（Runtime Logs ではない）
    - `tasks-app-api` → **Events** タブ → 最新の Deploy をクリック → **Build logs**
-2. よくある原因: `NODE_ENV=production` のとき devDependencies が入らず TypeScript ビルドが失敗
-   - `render.yaml` の `buildCommand` に `--include=dev` が含まれているか確認
+2. よくある原因:
+   - `NODE_ENV=production` のとき devDependencies が入らず TypeScript ビルドが失敗 → `buildCommand` に `--include=dev`
+   - ビルド中に DB に接続できない（`P1001: Can't reach database server`）→ `prisma db push` は `preDeployCommand` で実行
 3. `DATABASE_URL` が DB にリンクされているか確認
 4. Build ログで `prisma db push` が成功しているか確認
 
