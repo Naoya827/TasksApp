@@ -10,39 +10,54 @@
 
 ---
 
+## デプロイの進め方（2段階）
+
+まず **無料プランで体験**し、問題なければ **有料プランにアップグレード** します。
+
+| フェーズ | 目的 | 月額 |
+|---------|------|------|
+| **Phase 1: 無料で体験** | デプロイの流れを確認・動作テスト | $0 |
+| **Phase 2: 本番運用** | 常時稼働・データ永続化 | 約 $13 |
+
+### Render の料金の見方
+
+Render には2種類の「プラン」があります（[料金ページ](https://render.com/pricing) 参照）。
+
+| 種類 | 例 | あなたが選ぶもの |
+|------|-----|----------------|
+| **ワークスペース** | Hobby ($0), Pro ($25) | **Hobby**（個人利用で十分） |
+| **各サービスのコンピュート** | Starter ($7), Basic-256mb ($6) | Phase 2 で選択 |
+
+Phase 1 ではコンピュートも **Free** のまま進めます。
+
+---
+
 ## 前提
 
-- GitHub アカウント
-- Vercel アカウント（GitHub 連携）
-- Render アカウント（GitHub 連携）
-- このリポジトリが GitHub に push 済みであること
+- [x] GitHub にリポジトリがある（`Naoya827/TasksApp`）
+- [x] Vercel アカウント + GitHub 連携
+- [x] Render アカウント + GitHub 連携
 
 ---
 
 ## 全体の流れ
 
 ```
-1. GitHub に push
-2. Render で API + DB をデプロイ
-3. Render で Seed を実行
-4. Vercel でフロントエンドをデプロイ
-5. Render の CORS_ORIGIN を Vercel の URL に更新
-6. 動作確認
+Phase 1（無料で体験）
+  1. Render で API + DB をデプロイ（Blueprint）
+  2. Seed を実行
+  3. Vercel でフロントエンドをデプロイ
+  4. CORS を設定
+  5. 動作確認
+
+Phase 2（本番運用にアップグレード）
+  6. Render の API を Starter ($7) に変更
+  7. Render の DB を Basic-256mb ($6) に変更
 ```
 
 ---
 
-## Step 1: GitHub に push
-
-```bash
-git add .
-git commit -m "Add Vercel + Render deployment config"
-git push origin main
-```
-
----
-
-## Step 2: Render でバックエンド + DB をデプロイ
+## Step 1: Render でバックエンド + DB をデプロイ
 
 1. [Render Dashboard](https://dashboard.render.com) を開く
 2. **New** → **Blueprint**
@@ -69,7 +84,7 @@ curl https://tasks-app-api.onrender.com/api/health
 
 ---
 
-## Step 3: 初期データ（Seed）を投入
+## Step 2: 初期データ（Seed）を投入
 
 Render の無料プランでは Shell が使えない場合があります。その場合はローカルから本番 DB に接続して Seed を実行します。
 
@@ -101,7 +116,7 @@ Seed 完了後、以下のユーザーでログインできます（**本番運�
 
 ---
 
-## Step 4: Vercel でフロントエンドをデプロイ
+## Step 3: Vercel でフロントエンドをデプロイ
 
 1. [Vercel Dashboard](https://vercel.com/dashboard) を開く
 2. **Add New** → **Project**
@@ -129,7 +144,7 @@ Seed 完了後、以下のユーザーでログインできます（**本番運�
 
 ---
 
-## Step 5: CORS を設定
+## Step 4: CORS を設定
 
 Vercel の URL から API を呼び出せるよう、Render の環境変数を更新します。
 
@@ -146,7 +161,7 @@ https://tasks-app.vercel.app
 
 ---
 
-## Step 6: 動作確認
+## Step 5: 動作確認（Phase 1 完了）
 
 1. Vercel の URL をブラウザで開く
 2. ログイン画面が表示されることを確認
@@ -156,10 +171,33 @@ https://tasks-app.vercel.app
 
 ---
 
-## 本番運用前のチェックリスト
+## Phase 2: 有料プランへアップグレード（本番運用）
 
+Phase 1 で動作確認できたら、常時稼働のためにアップグレードします。
+
+### API サーバーを Starter に変更
+
+1. Render Dashboard → `tasks-app-api` → **Settings**
+2. **Instance Type** を **Free** → **Starter** ($7/月) に変更
+3. 保存（自動で再デプロイ）
+
+### PostgreSQL を Basic に変更
+
+1. Render Dashboard → `tasks-db` → **Settings**
+2. **Instance Type** を **Free** → **Basic-256mb** ($6/月) に変更
+3. 保存
+
+### アップグレード後の月額
+
+```
+Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/月
+```
+
+### 本番運用前のチェックリスト
+
+- [ ] API を Starter、DB を Basic-256mb にアップグレード済み
 - [ ] Seed の初期パスワード `password123` を変更する
-- [ ] Render の `JWT_SECRET` が自動生成されていることを確認（Dashboard → Environment）
+- [ ] Render の `JWT_SECRET` が自動生成されていることを確認
 - [ ] Vercel の `VITE_API_BASE` が正しい Render URL を指している
 - [ ] Render の `CORS_ORIGIN` が Vercel の URL と一致している
 
@@ -180,13 +218,15 @@ https://tasks-app.vercel.app
 
 ---
 
-## 無料プランの注意点
+## 無料プランの注意点（Phase 1）
 
 | サービス | 注意 |
 |---------|------|
-| Render Web Service | 15分間アクセスがないとスリープ。初回アクセスに30秒〜1分かかることがある |
-| Render PostgreSQL | 無料 DB は90日後に期限切れ。本格運用時は有料プランを検討 |
+| Render Web Service | 15分間アクセスがないとスリープ。初回アクセスに30秒〜1分かかる |
+| Render PostgreSQL | **無料 DB は30日で期限切れ**（その後14日の猶予→削除） |
 | Vercel | 個人利用なら通常は無料枠で十分 |
+
+無料版は「デプロイの体験・動作確認」向けです。実際に2人で毎日使うなら Phase 2 へのアップグレードを推奨します。
 
 ---
 
@@ -198,11 +238,24 @@ https://tasks-app.vercel.app
 2. `VITE_API_BASE` が `https://...onrender.com/api` になっているか確認
 3. Render の `CORS_ORIGIN` が Vercel の URL と完全一致しているか確認
 
-### Render が起動しない
+### Render が起動しない / Failed deploy
 
-1. Render Dashboard → `tasks-app-api` → **Logs** を確認
-2. `DATABASE_URL` が DB にリンクされているか確認
-3. Build ログで `prisma db push` が成功しているか確認
+1. **Build Logs** を確認（Runtime Logs ではない）
+   - `tasks-app-api` → **Events** タブ → 最新の Deploy をクリック → **Build logs**
+2. よくある原因: `NODE_ENV=production` のとき devDependencies が入らず TypeScript ビルドが失敗
+   - `render.yaml` の `buildCommand` に `--include=dev` が含まれているか確認
+3. `DATABASE_URL` が DB にリンクされているか確認
+4. Build ログで `prisma db push` が成功しているか確認
+
+### curl が何も返さない
+
+`curl` にタイムアウトを指定しないと、応答がない間ずっと待ち続けます。
+
+```bash
+curl --max-time 90 https://tasks-app-api-9jkk.onrender.com/api/health
+```
+
+ルート URL（`/`）ではなく `/api/health` を使ってください。
 
 ### Vercel で 404（ページリロード時）
 
