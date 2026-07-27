@@ -11,7 +11,7 @@ export function Header() {
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-bold text-primary">
-            二人のインボックス
+            2人のタスク帳
           </h1>
           {user && (
             <span className="rounded-full bg-accent px-3 py-1 text-sm text-accent-foreground">
