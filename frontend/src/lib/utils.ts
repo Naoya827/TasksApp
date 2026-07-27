@@ -32,10 +32,10 @@ export const PRIORITY_COLORS: Record<string, string> = {
 };
 
 export const STATUS_LABELS: Record<string, string> = {
-  INBOX: "Inbox",
-  ASSIGNED: "Assigned",
-  DONE: "Done",
-  ARCHIVED: "Archived",
+  INBOX: "誰かがやらなきゃ",
+  ASSIGNED: "やる人決定",
+  DONE: "お疲れ様",
+  ARCHIVED: "過去の履歴",
 };
 
 export const COLUMN_COLORS: Record<string, string> = {

@@ -136,12 +136,12 @@ export function BoardPage() {
             {showArchived ? (
               <>
                 <EyeOff className="h-4 w-4" />
-                Archived列を非表示
+                履歴を非表示
               </>
             ) : (
               <>
                 <Eye className="h-4 w-4" />
-                Archived列を表示
+                履歴を表示
               </>
             )}
           </Button>
