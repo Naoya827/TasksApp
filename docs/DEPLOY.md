@@ -216,7 +216,16 @@ Hobby ワークスペース ($0) + Starter API ($7) + Basic DB ($6) = 約 $13/�
 本番のログイン情報は、ローカルから Render の DB に接続して更新します。
 
 1. Render → `tasks-db` → **Connections** → **External Database URL** をコピー
-2. ターミナルで実行（値は実際のものに置き換え）:
+2. **方法 A（おすすめ）:** `.env.credentials` ファイルを使う
+
+```bash
+cd backend
+cp .env.credentials.example .env.credentials
+# .env.credentials を編集（メール・パスワード・DATABASE_URL）
+npm run db:update-credentials
+```
+
+2. **方法 B:** 1行で環境変数を渡す（`export` せずにまとめて指定）
 
 ```bash
 cd backend
@@ -228,6 +237,8 @@ USER_AYUMI_EMAIL="ayumi@your-email.com" \
 USER_AYUMI_PASSWORD="（あゆみの新しいパスワード）" \
 npm run db:update-credentials
 ```
+
+※ 変数を行ごとに設定しても `export` しないと `npm run` に渡りません。
 
 メールアドレスを `naoya@example.com` から変更する場合は、デフォルトで旧メールから検索して更新します。  
 別の旧メールから変更する場合は `USER_NAOYA_OLD_EMAIL` / `USER_AYUMI_OLD_EMAIL` も指定してください。
